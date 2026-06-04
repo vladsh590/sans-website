@@ -176,3 +176,97 @@ if (scrollToTopBtn) {
         });
     });
 }
+
+// Discount Popup for Product Pages
+const discountPopup = document.getElementById('discountPopup');
+const discountMini = document.getElementById('discountMini');
+const discountClose = document.getElementById('discountClose');
+const discountCloseFull = document.getElementById('discountCloseFull');
+const discountForm = document.getElementById('discountForm');
+
+if (discountPopup) {
+    // Check if we're on a product page
+    const isProductPage = window.location.pathname.includes('/products/');
+    
+    if (isProductPage) {
+        // Random delay between 8-9 seconds
+        const delay = Math.floor(Math.random() * (9000 - 8000 + 1)) + 8000;
+        
+        // Always show popup after delay on product pages
+        setTimeout(() => {
+            discountPopup.classList.add('show');
+        }, delay);
+    }
+    
+    // Click on mini popup to expand
+    discountMini.addEventListener('click', () => {
+        discountPopup.classList.add('expanded');
+    });
+    
+    // Close mini popup (X button on mini) - closes completely
+    discountClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        discountPopup.classList.remove('show', 'expanded');
+    });
+    
+    // Close full popup (X button on full) - closes completely
+    discountCloseFull.addEventListener('click', (e) => {
+        e.stopPropagation();
+        discountPopup.classList.remove('show', 'expanded');
+    });
+    
+    // Click outside full popup - collapse to mini (don't close)
+    document.addEventListener('click', (e) => {
+        if (discountPopup.classList.contains('expanded')) {
+            // Check if click is outside the popup content
+            const popupContent = discountPopup.querySelector('.discount-popup-full');
+            if (popupContent && !popupContent.contains(e.target) && !discountMini.contains(e.target)) {
+                // Collapse to mini instead of closing
+                discountPopup.classList.remove('expanded');
+            }
+        }
+    });
+    
+    // Form submission
+    if (discountForm) {
+        discountForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('discountName').value,
+                phone: document.getElementById('discountPhone').value,
+                email: document.getElementById('discountEmail').value,
+                message: document.getElementById('discountMessage').value,
+                type: 'discount'
+            };
+            
+            // Here you would send data to server
+            alert(`Спасибо за заявку, ${formData.name}!\n\nМы свяжемся с вами в ближайшее время и расскажем о специальном предложении.\n\nТелефон: ${formData.phone}`);
+            
+            // Hide popup
+            discountPopup.classList.remove('show', 'expanded');
+            
+            // Reset form
+            discountForm.reset();
+            
+            /* In production, use fetch:
+            fetch('/api/discount', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Спасибо за заявку! Мы свяжемся с вами в ближайшее время.');
+                discountPopup.classList.remove('show', 'expanded');
+                discountForm.reset();
+            })
+            .catch(error => {
+                alert('Произошла ошибка. Пожалуйста, позвоните нам или попробуйте позже.');
+            });
+            */
+        });
+    }
+}
